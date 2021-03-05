@@ -62,10 +62,8 @@ const getCountryAndNeighbor = function (country) {
   const request = new XMLHttpRequest();
   request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
   request.send();
-  console.log(request.responseText);
 
   request.addEventListener('load', function () {
-    console.log(this.responseText);
     const [data] = JSON.parse(this.responseText);
     console.log(data);
 
@@ -93,17 +91,56 @@ const getCountryAndNeighbor = function (country) {
 };
 
 // getCountryAndNeighbor('Norway');
-getCountryAndNeighbor('georgia');
+// getCountryAndNeighbor('georgia');
 
-setTimeout(() => {
-  console.log('1s0');
-  setTimeout(() => {
-    console.log('1s0');
-    setTimeout(() => {
-      console.log('1s0');
-      setTimeout(() => {
-        console.log('1s0');
-      }, 1000);
-    }, 1000);
-  }, 1000);
-}, 1000);
+// setTimeout(() => {
+//   console.log('1s0');
+//   setTimeout(() => {
+//     console.log('1s0');
+//     setTimeout(() => {
+//       console.log('1s0');
+//       setTimeout(() => {
+//         console.log('1s0');
+//       }, 1000);
+//     }, 1000);
+//   }, 1000);
+// }, 1000);
+
+// const request = new XMLHttpRequest();
+// request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
+// request.send();
+
+// const request = fetch('https://restcountries.eu/rest/v2/name/portugal');
+// console.log(request);
+
+// const getCountryData = function(country) {
+//   fetch(`https://restcountries.eu/rest/v2/name/${country}`).then(function(response) {
+//     console.log(response);
+//     return response.json();
+
+//   }).then(function(data) {
+//     console.log(data);
+//     console.log(data[0]);
+//     renderCountry(data[0])
+//   })
+// }
+
+const getCountryDataByCallbackHell = function (country) {
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
+  request.send();
+
+  request.addEventListener('load', function () {
+    const [data] = JSON.parse(this.responseText);
+    renderCountry(data);
+  });
+};
+
+const getCountryDataByPromise = function (country) {
+  fetch(`https://restcountries.eu/rest/v2/name/${country}`)
+    .then(response => response.json())
+    .then(data => renderCountry(data[0]));
+};
+
+getCountryDataByCallbackHell('Norway');
+getCountryDataByPromise('Norway')
