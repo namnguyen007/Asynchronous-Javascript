@@ -272,14 +272,23 @@ const getCountryDataByPromise = function (country) {
     });
 };
 
-btn.addEventListener('click', function () {
-  getCountryDataByPromise('Japan');
-});
-
-// getCountryDataByPromise('sdfd')
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(err)
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
 
 const whereAmI = function (lat, lng) {
-  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+  getPosition()
+    .then(pos => {
+      const {latitude: lat,longitude: lng } = pos.coords;
+      console.log(lat,lng);
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
     .then(response => {
       // console.log(response);
       if (!response.ok) throw new Error('Problem with geocoding');
@@ -301,10 +310,8 @@ const whereAmI = function (lat, lng) {
     })
     .catch(err => console.log(`${err.message}`, '❤❤'));
 };
-// whereAmI(19.037, 72.873);
-// whereAmI(52.508, 13.381);
-// whereAmI(-33.933, 18.474);
 
+btn.addEventListener('click', whereAmI)
 // console.log('tEST START');
 // setTimeout(() => console.log('0 second timer'), 0);
 // Promise.resolve('Resolved promise 1').then(res => console.log(res));
@@ -314,42 +321,42 @@ const whereAmI = function (lat, lng) {
 // });
 // console.log('Test end');
 
-const lotterPromise = new Promise(function (resolve, reject) {
-  console.log('Lotter draw is happening 🔮');
-  setTimeout(function () {
-    if (Math.random() >= 0.5) {
-      resolve('You won 1 million dollar');
-    } else {
-      reject(new Error('You lost your money'));
-    }
-  }, 2000);
-});
+// const lotterPromise = new Promise(function (resolve, reject) {
+//   console.log('Lotter draw is happening 🔮');
+//   setTimeout(function () {
+//     if (Math.random() >= 0.5) {
+//       resolve('You won 1 million dollar');
+//     } else {
+//       reject(new Error('You lost your money'));
+//     }
+//   }, 2000);
+// });
 
-lotterPromise.then(res => console.log(res)).catch(err => console.error(err));
+// lotterPromise.then(res => console.log(res)).catch(err => console.error(err));
 
 // Promisifying setTimeout
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
 
-wait(1)
-  .then(() => {
-    console.log('1 sec passed');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('2 sec passed');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('3 sec passed');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('4 sec passed');
-  })
+// wait(1)
+//   .then(() => {
+//     console.log('1 sec passed');
+//     return wait(1);
+//   })
+//   .then(() => {
+//     console.log('2 sec passed');
+//     return wait(1);
+//   })
+//   .then(() => {
+//     console.log('3 sec passed');
+//     return wait(1);
+//   })
+//   .then(() => {
+//     console.log('4 sec passed');
+//   })
 
 // setTimeout(() => {
 //   console.log('1 sec passed');
@@ -364,5 +371,5 @@ wait(1)
 //   }, 1000);
 // }, 1000);
 
-Promise.resolve('abc').then(x => console.log(x))
-Promise.reject(new Error('Problem')).catch(x => console.log(x))
+// Promise.resolve('abc').then(x => console.log(x))
+// Promise.reject(new Error('Problem')).catch(x => console.log(x))
