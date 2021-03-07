@@ -285,8 +285,8 @@ const getPosition = function () {
 const whereAmI = function (lat, lng) {
   getPosition()
     .then(pos => {
-      const {latitude: lat,longitude: lng } = pos.coords;
-      console.log(lat,lng);
+      const { latitude: lat, longitude: lng } = pos.coords;
+      console.log(lat, lng);
       return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
     })
     .then(response => {
@@ -311,65 +311,49 @@ const whereAmI = function (lat, lng) {
     .catch(err => console.log(`${err.message}`, '❤❤'));
 };
 
-btn.addEventListener('click', whereAmI)
-// console.log('tEST START');
-// setTimeout(() => console.log('0 second timer'), 0);
-// Promise.resolve('Resolved promise 1').then(res => console.log(res));
-// Promise.resolve('Resolved promise 2').then(res => {
-//   for (let i = 0; i < 1000000000; i++) {}
-//   console.log(res);
-// });
-// console.log('Test end');
+btn.addEventListener('click', whereAmI);
 
-// const lotterPromise = new Promise(function (resolve, reject) {
-//   console.log('Lotter draw is happening 🔮');
-//   setTimeout(function () {
-//     if (Math.random() >= 0.5) {
-//       resolve('You won 1 million dollar');
-//     } else {
-//       reject(new Error('You lost your money'));
-//     }
-//   }, 2000);
-// });
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+const imgContainer = document.querySelector('.images');
 
-// lotterPromise.then(res => console.log(res)).catch(err => console.error(err));
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
 
-// Promisifying setTimeout
-// const wait = function (seconds) {
-//   return new Promise(function (resolve) {
-//     setTimeout(resolve, seconds * 1000);
-//   });
-// };
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
 
-// wait(1)
-//   .then(() => {
-//     console.log('1 sec passed');
-//     return wait(1);
-//   })
-//   .then(() => {
-//     console.log('2 sec passed');
-//     return wait(1);
-//   })
-//   .then(() => {
-//     console.log('3 sec passed');
-//     return wait(1);
-//   })
-//   .then(() => {
-//     console.log('4 sec passed');
-//   })
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+  });
+};
 
-// setTimeout(() => {
-//   console.log('1 sec passed');
-//   setTimeout(() => {
-//     console.log('2 sec passed');
-//     setTimeout(() => {
-//       console.log('3 sec passed');
-//       setTimeout(() => {
-//         console.log('4 sec passed');
-//       }, 1000);
-//     }, 1000);
-//   }, 1000);
-// }, 1000);
+let currentImg;
 
-// Promise.resolve('abc').then(x => console.log(x))
-// Promise.reject(new Error('Problem')).catch(x => console.log(x))
+createImage('img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image 1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image 2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(err => console.error(err));
