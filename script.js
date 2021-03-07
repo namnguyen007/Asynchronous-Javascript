@@ -426,12 +426,127 @@ const get3Countries = async function (c1, c2, c3) {
     const data = await Promise.all([
       getJSON(`https://restcountries.eu/rest/v2/name/${c1}`),
       getJSON(`https://restcountries.eu/rest/v2/name/${c2}`),
-      getJSON(`https://restcountries.eu/rest/v2/name/${c3}`)
-     ] );
-     console.log(data.map(d => d[0].capital));
+      getJSON(`https://restcountries.eu/rest/v2/name/${c3}`),
+    ]);
+    console.log(data.map(d => d[0].capital));
   } catch (err) {
     console.log(err);
   }
 };
 
 get3Countries('USA', 'Georgia', 'Belgium');
+
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.eu/rest/v2/name/italy`),
+    getJSON(`https://restcountries.eu/rest/v2/name/danmark`),
+    getJSON(`https://restcountries.eu/rest/v2/name/belgium`),
+  ]);
+  console.log(res[0]);
+})();
+
+const timeout = function (s) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('it took too long'));
+    }, s * 1000);
+  });
+};
+Promise.race([
+  getJSON(`https://restcountries.eu/rest/v2/name/belgium`),
+  timeout(0.1),
+])
+  .then(res => console.log(res))
+  .catch(err => console.log(err));
+
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.log(err));
+
+Promise.all([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.log(err));
+
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const imgContainer = document.querySelector('.images');
+
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
+
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+  });
+};
+
+// let currentImg;
+
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 1 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage('img/img-2.jpg');
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 2 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   })
+//   .catch(err => console.error(err));
+
+const loadNPause = async function() {
+  try {
+    // Load image 1
+   let img = await createImage('img/img-1.jpg');
+   console.log('Image 1 loaded');
+   await wait(2);
+    // Load image 2
+    img = await createImage('img/img-2.jpg')
+   console.log('Image 2 loaded');
+   await wait(2);
+   img.style.display = 'none';
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const loadAll = async function(imgArr) {
+  try{
+const imgs = imgArr.map(async img => await createImage(img));
+console.log(imgs);
+const imgEl = await Promise.all(imgs);
+console.log(imgEl);
+imgEl.forEach(img => img.classList.add('parallel'))
+
+  } catch(err) {
+console.log(err);
+  }
+}
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
