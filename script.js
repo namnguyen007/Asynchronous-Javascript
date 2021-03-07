@@ -368,7 +368,6 @@ const getPosition = function () {
   });
 };
 
-
 const whereAmI = async function () {
   try {
     // Geolocation
@@ -378,23 +377,36 @@ const whereAmI = async function () {
 
     // Reverse Geocoding
     const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    if(!resGeo.ok) throw new Error('Problem getting location data')
+    if (!resGeo.ok) throw new Error('Problem getting location data');
     const dataGeo = await resGeo.json();
     console.log(dataGeo);
 
     const res = await fetch(
       `https://restcountries.eu/rest/v2/name/${dataGeo.country}`
     );
-    if(!res.ok) throw new Error('Problem getting country ')
+    if (!res.ok) throw new Error('Problem getting country ');
 
     const data = await res.json();
     console.log(data);
     renderCountry(data[0]);
-  } catch(err) {
-console.error(`123${err}123`);
-renderError(`sth wrong $$$ ${err.message}`)
+
+    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+  } catch (err) {
+    console.error(`123${err}123`);
+    renderError(`sth wrong $$$ ${err.message}`);
+
+    // Reject promise returned from async function
+    throw err
   }
 };
-whereAmI();
-console.log('First');
 
+
+(async function() {
+  try {
+    const city= await whereAmI();
+    console.log(`2: ${city}`);
+  }catch(err) {
+    console.log(`2: ${err.message} ❤`);
+  }
+  console.log('3: Finished getting location');
+})();
