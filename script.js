@@ -26,7 +26,7 @@ const renderCountry = function (data, className = '') {
         </article>
  `;
   countriesContainer.insertAdjacentHTML('beforeend', html);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 ///////////////////////////////////////
@@ -226,7 +226,7 @@ const getCountryDataByPromise = function (country) {
       renderCountry(data[0]);
       const neighbour = data[0].borders[1];
 
-      if (!neighbour) throw new Error('No neighbour')
+      if (!neighbour) throw new Error('No neighbour');
 
       // Country 2
       return getJSON(
@@ -261,7 +261,8 @@ const getCountryDataByPromise = function (country) {
     // .then(response => response.json())
     .then(data => {
       console.log(data);
-      renderCountry(data, 'neighbour')})
+      renderCountry(data, 'neighbour');
+    })
     .catch(err => {
       console.error(`aaaaa${err} 111111`);
       renderError(`sth wrong: ${err.message}`);
@@ -276,3 +277,29 @@ btn.addEventListener('click', function () {
 });
 
 // getCountryDataByPromise('sdfd')
+
+const whereAmI = function (lat, lng) {
+  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+    .then(response => {
+      // console.log(response);
+      if (!response.ok) throw new Error('Problem with geocoding');
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.country}`);
+      return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
+    })
+    .then(res => {
+      console.log(res);
+      if (!res.ok) throw new Error('Country not found');
+      return res.json();
+    })
+    .then(data => {
+      console.log(data);
+      renderCountry(data[0]);})
+    .catch(err => console.log(`${err.message}`, '❤❤'));
+};
+// whereAmI(19.037, 72.873);
+// whereAmI(52.508, 13.381);
+whereAmI(-33.933, 18.474);
